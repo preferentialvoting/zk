@@ -22,23 +22,5 @@ app.get('/api/candidates', (req, res) => {
   res.json(candidates);
 });
 
-// Endpoint para registrar um voto
-app.post('/api/vote', (req, res) => {
-  const { voterId, firstChoice, secondChoice } = req.body;
-
-  if (!voterId || !firstChoice || !secondChoice) {
-    return res.status(400).json({ error: 'Dados incompletos' });
-  }
-
-  // Verifica se o eleitor já votou
-  if (votes[voterId]) {
-    return res.status(400).json({ error: 'Eleitor já votou' });
-  }
-
-  // Registra o voto
-  votes[voterId] = { firstChoice, secondChoice };
-  res.json({ message: 'Voto registrado com sucesso!' });
-});
-
 // Exporta o app para uso no Vercel
 module.exports = app;
