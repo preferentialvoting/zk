@@ -1,0 +1,18 @@
+{
+  "name": "voting-system",
+  "version": "1.0.0",
+  "description": "Sistema de votação",
+  "scripts": {
+    "start": "node index.js",
+    "vercel-build": "echo 'Ready for Vercel deployment!'"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.x"
+  }
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Candidatos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cadastro de Candidatos</h1>
+    <form id="candidateForm">
+        <input type="text" id="name" placeholder="Nome" required />
+        <input type="text" id="affiliation" placeholder="Filiação" required />
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Lista de Candidatos</h2>
+    <ul id="candidateList"></ul>
+
+    <script>
+        const candidateForm = document.getElementById('candidateForm');
+        const candidateList = document.getElementById('candidateList');
+
+        let candidates = [];
+
+        // Função para atualizar a lista de candidatos na interface do usuário
+        function updateCandidateList() {
+            candidateList.innerHTML = '';
+            candidates.forEach((candidate, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${candidate.name} (${candidate.affiliation})`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Excluir';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => {
+                    candidates.splice(index, 1);
+                    updateCandidateList();
+                };
+
+                listItem.appendChild(deleteButton);
+                candidateList.appendChild(listItem);
+            });
+        }
+
+        // Função para adicionar novo candidato
+        candidateForm.onsubmit = (event) => {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const affiliation = document.getElementById('affiliation').value;
+
+            if (name && affiliation) {
+                candidates.push({ name, affiliation });
+                updateCandidateList();
+                candidateForm.reset();
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        };
+    </script>
+</body>
+</html>

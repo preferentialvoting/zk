@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Votação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        select, input {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #confirmationScreen, #summaryScreen {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Votação</h1>
+    <form id="votingForm">
+        <label for="firstChoice">Primeira Escolha:</label>
+        <select id="firstChoice" required></select>
+
+        <label for="secondChoice">Segunda Escolha:</label>
+        <select id="secondChoice" required></select>
+
+        <input type="text" id="voterId" placeholder="Seu ID de Eleitor" required />
+
+        <button type="submit">Votar</button>
+    </form>
+
+    <div id="confirmationScreen">
+        <h2>Confirmação de Voto</h2>
+        <p>Primeira Escolha: <span id="confirmationFirstChoice"></span></p>
+        <p>Segunda Escolha: <span id="confirmationSecondChoice"></span></p>
+        <button id="confirmVoteButton">Confirmar Voto</button>
+    </div>
+
+    <div id="summaryScreen">
+        <h2>Resumo do Voto</h2>
+        <p id="summaryChoices"></p>
+    </div>
+
+    <script>
+        const votingForm = document.getElementById('votingForm');
+        const firstChoiceSelect = document.getElementById('firstChoice');
+        const secondChoiceSelect = document.getElementById('secondChoice');
+        const confirmationScreen = document.getElementById('confirmationScreen');
+        const summaryScreen = document.getElementById('summaryScreen');
+        const confirmationFirstChoice = document.getElementById('confirmationFirstChoice');
+        const confirmationSecondChoice = document.getElementById('confirmationSecondChoice');
+        const summaryChoices = document.getElementById('summaryChoices');
+        const confirmVoteButton = document.getElementById('confirmVoteButton');
+
+        let selectedFirstChoice = null;
+        let selectedSecondChoice = null;
+
+        // Função para popular as opções de candidatos
+        async function populateChoices() {
+            try {
+                const response = await fetch('/api/candidates');
+                const candidates = await response.json();
+
+                candidates.forEach(candidate => {
+                    const option1 = document.createElement('option');
+                    option1.value = candidate.id;
+                    option1.textContent = `${candidate.name} (${candidate.affiliation})`;
+                    firstChoiceSelect.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = candidate.id;
+                    option2.textContent = `${candidate.name} (${candidate.affiliation})`;
+                    secondChoiceSelect.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar candidatos:', error);
+            }
+        }
+
+        // Mostrar tela de confirmação
+        votingForm.onsubmit = (event) => {
+            event.preventDefault();
+
+            selectedFirstChoice = firstChoiceSelect.options[firstChoiceSelect.selectedIndex].text;
+            selectedSecondChoice = secondChoiceSelect.options[secondChoiceSelect.selectedIndex].text;
+
+            document.getElementById('confirmationFirstChoice').textContent = selectedFirstChoice;
+            document.getElementById('confirmationSecondChoice').textContent = selectedSecondChoice;
+
+            votingForm.style.display = 'none';
+            confirmationScreen.style.display = 'block';
+        };
+
+        // Confirmar o voto e enviar para o backend
+        confirmVoteButton.onclick = async () => {
+            const voterId = document.getElementById('voterId').value;
+            const firstChoice = firstChoiceSelect.value;
+            const secondChoice = secondChoiceSelect.value;
+
+            try {
+                const response = await fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ voterId, firstChoice, secondChoice }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    summaryChoices.textContent = `Você votou em ${selectedFirstChoice} como primeira escolha e em ${selectedSecondChoice} como segunda escolha.`;
+                    confirmationScreen.style.display = 'none';
+                    summaryScreen.style.display = 'block';
+                } else {
+                    alert(result.error || 'Erro ao registrar voto.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar voto:', error);
+            }
+        };
+
+        populateChoices();
+    </script>
+</body>
+</html>
