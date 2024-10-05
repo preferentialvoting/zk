@@ -1,5 +1,3 @@
-// voting.js reformulado para compatibilidade com deploy no Vercel
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -42,8 +40,5 @@ app.post('/api/vote', (req, res) => {
   res.json({ message: 'Voto registrado com sucesso!' });
 });
 
-// Inicia o servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// Exporta o app para uso no Vercel
+module.exports = app;
